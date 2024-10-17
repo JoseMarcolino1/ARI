@@ -2,13 +2,17 @@ const express = require('express');
 
 const app = express();
 
+const PORT = 3000;
+
+app.use(express.json());
+
 // Importar rotas
-const usuarios = require('./routes/usuarios');
+const usuarios = require('./src/routes/usuarios');
 
-// Usar rotas
-app.use(usuarios);
+// Usar rotas com um prefixo
+app.use('/usuarios', usuarios);
 
-// Iniciar o servidor
-app.listen(3000, () => {
- console.log('Servidor rodando na porta 3000');
-});
+
+app.listen(PORT, () => {
+    console.log("SERVIDOR TA FUNFANDO")
+})

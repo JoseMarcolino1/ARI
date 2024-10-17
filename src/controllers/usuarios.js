@@ -1,6 +1,13 @@
-const cadastrarUsuario = use(express.json());
-// Rota para criar um novo usuário
-cadastrarUsuario.post("/usuarios", async (req, res) => {
+const express = require('express');
+const { PrismaClient } = require('@prisma/client');
+const router = express.Router(); 
+
+const prisma = new PrismaClient(); // Cria uma instância do Prisma
+
+router.use(express.json());
+
+// Rota para criar um usuário
+async function criaUsuario (req, res) {
   const { nome, email, senha, data_nascimento } = req.body;
   try {
     const novoUsuario = await prisma.usuario.create({
@@ -13,12 +20,13 @@ cadastrarUsuario.post("/usuarios", async (req, res) => {
     });
     res.status(201).json(novoUsuario);
   } catch (error) {
+    console.error(error);
     res.status(400).json({ error: "Erro ao criar usuário." });
   }
-});
+};
 
-
-cadastrarUsuario.get("/usuarios", async (req, res) => {
+// Rota para listar usuários
+async function listaUsuario (req, res) {
   try {
     const usuarios = await prisma.usuario.findMany({
       where: {
@@ -27,12 +35,13 @@ cadastrarUsuario.get("/usuarios", async (req, res) => {
     });
     res.status(200).json(usuarios);
   } catch (error) {
-    
-    res.status(500).json({ error: "Erro ao listar usuários." });
+    console.error(error)
+    res.status(500).json({ message: "Erro ao listar usuários." });
   }
-});
+};
 
-cadastrarUsuario.put("/usuarios/:id", async (req, res) => {
+// Rota para atualizar um usuário
+async function atualizaUsuario (req, res) {
   const { id } = req.params; 
   const { nome, email, senha, data_nascimento } = req.body; 
   try {
@@ -52,9 +61,10 @@ cadastrarUsuario.put("/usuarios/:id", async (req, res) => {
     }
     res.status(500).json({ error: "Erro ao atualizar usuário." });
   }
-});
+};
 
-cadastrarUsuario.delete("/usuarios/:id", async (req, res) => {
+// Rota para excluir um usuário
+async function deletaUsuario(req, res)  {
   const { id } = req.params; 
 
   try {
@@ -70,7 +80,11 @@ cadastrarUsuario.delete("/usuarios/:id", async (req, res) => {
     }
     res.status(500).json({ error: "Erro ao excluir usuário." });
   }
-});
+};
 
-
-module.exports = {cadastrarUsuario};
+module.exports = {
+  criaUsuario,
+  listaUsuario,
+  atualizaUsuario,
+  deletaUsuario,
+}; 
