@@ -10,15 +10,16 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("url")
+  url      = env("DATABASE_URL")
 }
 
 model Usuario {
- id Int @id @default(autoincrement())
- nome String
- email String @unique
- senha String
- data_nascimento DateTime
- createdAt DateTime @default(now())
- updatedAt DateTime @updatedAt
+    id              Int      @id @default(autoincrement())
+    nome            String
+    email           String   @unique
+    senha           String
+    data_nascimento DateTime
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime
+    status          Boolean  @default(true) // Novo campo
 }
