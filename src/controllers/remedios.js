@@ -8,7 +8,7 @@ router.use(express.json());
 
 // Rota para criar um remédio
 async function criaRemedio(req, res) {
-  const { nome, funcao, dosagem, status } = req.body;
+  const { nome, funcao, dosagem, status = true } = req.body;
   try {
     const novoRemedio = await prisma.remedio.create({
       data: { nome, funcao, dosagem, status },
@@ -24,7 +24,7 @@ async function criaRemedio(req, res) {
 async function listaRemedios(req, res) {
   try {
     const remedios = await prisma.remedio.findMany({
-      where: { deletedAt: null },
+      where: { status: true },
     });
     res.status(200).json(remedios);
   } catch (error) {
@@ -51,13 +51,13 @@ async function atualizaRemedio(req, res) {
   }
 }
 
-// Rota para excluir um remédio
+// Rota para excluir logicamente um remédio
 async function deletaRemedio(req, res) {
   const { id } = req.params;
   try {
     const remedioExcluido = await prisma.remedio.update({
       where: { id: Number(id) },
-      data: { deletedAt: new Date() },
+      data: { status: false },
     });
     res.status(200).json({ mensagem: "Remédio excluído logicamente.", remedio: remedioExcluido });
   } catch (error) {
