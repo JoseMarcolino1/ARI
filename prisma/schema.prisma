@@ -14,29 +14,30 @@ datasource db {
 }
 
 model Usuario {
-  id             Int      @id @default(autoincrement())
-  nome           String
-  email           String   @unique
-  senha          String
-  data_nascimento  DateTime
-  status         Boolean  @default(true)
-  createdAt       DateTime @default(now())
+  id              Int          @id @default(autoincrement())
+  nome            String
+  email           String       @unique
+  senha           String
+  data_nascimento DateTime
+  status          Boolean      @default(true)
+  createdAt       DateTime     @default(now())
   updatedAt       DateTime
-  Prescricao     Prescricao[]
+  Prescricao      Prescricao[]
 }
 
 model Prescricao {
-  id            Int        @id @default(autoincrement())
-  id_usuario    Int
-  observacao    String?
-  id_remedio    Int
-  frequencia    DateTime
-  dt_inicio     DateTime
-  dt_fim        DateTime
-  status        Boolean    @default(true)
-  Usuario       Usuario    @relation(fields: [id_usuario], references: [id])
-  Remedio       Remedio    @relation(fields: [id_remedio], references: [id])
-  Historico     Historico[]
+  id                 Int         @id @default(autoincrement())
+  id_usuario         Int
+  observacao         String?
+  id_remedio         Int
+  frequencia_valor   Int
+  frequencia_unidade String
+  dt_inicio          DateTime
+  dt_fim             DateTime
+  status             Boolean     @default(true)
+  Usuario            Usuario     @relation(fields: [id_usuario], references: [id])
+  Remedio            Remedio     @relation(fields: [id_remedio], references: [id])
+  Historico          Historico[]
 }
 
 model Historico {
@@ -48,11 +49,10 @@ model Historico {
 }
 
 model Remedio {
-  id            Int        @id @default(autoincrement())
-  nome          String
-  funcao        Int
-  dosagem       Float
-  status        Boolean    @default(true)
-  Prescricao    Prescricao[]
+  id         Int          @id @default(autoincrement())
+  nome       String
+  funcao     String
+  dosagem    Float
+  status     Boolean      @default(true)
+  Prescricao Prescricao[]
 }
-

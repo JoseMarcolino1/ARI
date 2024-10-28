@@ -35,9 +35,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Importar rotas
 const usuarios = require('./src/routes/usuarios');
+const remedios = require('./src/routes/remedios');
+const prescricao = require('./src/routes/prescricao');
 
 // Usar rotas com um prefixo
 app.use('/usuarios', usuarios);
+app.use('/remedios', remedios);
+app.use('/prescricao', prescricao);
 
 // Iniciar o servidor
 app.listen(PORT, () => {

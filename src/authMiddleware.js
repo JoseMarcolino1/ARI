@@ -1,16 +1,24 @@
-// Middleware para autenticação do token
+const jwt = require("jsonwebtoken");
+
 function autenticarToken(req, res, next) {
-    const token = req.headers['authorization']?.split(' ')[1]; // "Bearer <token>"
-  
-    if (!token) {
-      return res.sendStatus(401); // Sem token
-    }
-  
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.sendStatus(403); // Token inválido
-      }
-      req.user = user; // Armazenar os dados do usuário na requisição
-      next(); // Passar para o próximo middleware ou rota
-    });
+  const token =
+    req.headers.authorization && req.headers.authorization.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Token não fornecido" });
   }
+
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET_JWT); 
+    console.log('DECODED: ', decoded.id);
+    req.userId = decoded.id;
+    console.log('REQ.USERID: ', req.userId);
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Token inválido" });
+  }
+}
+
+module.exports = {
+  autenticarToken,
+};

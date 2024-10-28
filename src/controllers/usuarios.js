@@ -97,7 +97,9 @@ async function criaUsuario(req, res) {
  *                     type: boolean
  */
 async function listaUsuario(req, res) {
+  const id_usuario = req.user?.id;
   try {
+    console.log('ID USUARIO:', id_usuario);
     const usuarios = await prisma.usuario.findMany({
       where: {
         status: true,
@@ -166,12 +168,12 @@ async function atualizaUsuario(req, res) {
         updatedAt: new Date(),
       },
     });
-    res.status(200).json(usuarioAtualizado);
+    res.status(200).json({ message: "Usuario atualizado com sucesso", usuario: usuarioAtualizado });
   } catch (error) {
     if (error.code === 'P2025') {
       return res.status(404).json({ error: "Usuário não encontrado." });
     }
-    res.status(500).json({ error: "Erro ao atualizar usuário.", details: error.message }); // Adiciona detalhes do erro para depuração
+    res.status(500).json({ error: "Erro ao atualizar usuário.", details: error.message }); 
   }
 }
 
@@ -287,6 +289,10 @@ async function loginUsuario(req, res) {
   }
 }
 
+async function pegarIdUsuario(req, res) {
+  res.status(200).json({ id: req.userId });
+}
+
 
 
 module.exports = {
@@ -295,4 +301,5 @@ module.exports = {
   atualizaUsuario,
   deletaUsuario,
   loginUsuario,
+  pegarIdUsuario
 };
