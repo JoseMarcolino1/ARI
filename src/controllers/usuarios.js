@@ -173,7 +173,7 @@ async function atualizaUsuario(req, res) {
     if (error.code === 'P2025') {
       return res.status(404).json({ error: "Usuário não encontrado." });
     }
-    res.status(500).json({ error: "Erro ao atualizar usuário.", details: error.message }); 
+    res.status(500).json({ error: "Erro ao atualizar usuário.", details: error.message });
   }
 }
 

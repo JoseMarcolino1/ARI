@@ -74,7 +74,7 @@ async function listaRemedios(req, res) {
 // Rota para atualizar um remédio
 async function atualizaRemedio(req, res) {
   const { id } = req.params;
-  const { nome, funcao, dosagem, status } = req.body;
+  const { nome, funcao, dosagem, status = true } = req.body;
   try {
     const remedioAtualizado = await prisma.remedio.update({
       where: { id: Number(id) },
