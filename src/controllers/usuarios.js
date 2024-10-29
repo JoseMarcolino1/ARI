@@ -1,10 +1,9 @@
-const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const express = require("express");
+const { PrismaClient } = require("@prisma/client");
 const router = express.Router();
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-
-
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { blackListToken, verifyToken } = require("../authMiddleware");
 
 const prisma = new PrismaClient();
 
@@ -68,7 +67,9 @@ async function criaUsuario(req, res) {
     res.status(201).json(novoUsuario);
   } catch (error) {
     console.error(error);
-    res.status(400).json({ error: "Erro ao criar usuário.", details: error.message });
+    res
+      .status(400)
+      .json({ error: "Erro ao criar usuário.", details: error.message });
   }
 }
 
@@ -99,7 +100,7 @@ async function criaUsuario(req, res) {
 async function listaUsuario(req, res) {
   const id_usuario = req.user?.id;
   try {
-    console.log('ID USUARIO:', id_usuario);
+    console.log("ID USUARIO:", id_usuario);
     const usuarios = await prisma.usuario.findMany({
       where: {
         status: true,
@@ -168,12 +169,17 @@ async function atualizaUsuario(req, res) {
         updatedAt: new Date(),
       },
     });
-    res.status(200).json({ message: "Usuario atualizado com sucesso", usuario: usuarioAtualizado });
+    res.status(200).json({
+      message: "Usuario atualizado com sucesso",
+      usuario: usuarioAtualizado,
+    });
   } catch (error) {
-    if (error.code === 'P2025') {
+    if (error.code === "P2025") {
       return res.status(404).json({ error: "Usuário não encontrado." });
     }
-    res.status(500).json({ error: "Erro ao atualizar usuário.", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Erro ao atualizar usuário.", details: error.message });
   }
 }
 
@@ -210,11 +216,11 @@ async function deletaUsuario(req, res) {
       usuario: {
         id: usuarioExcluido.id,
         status: usuarioExcluido.status,
-        updatedAt: usuarioExcluido.updatedAt
-      }
+        updatedAt: usuarioExcluido.updatedAt,
+      },
     });
   } catch (error) {
-    if (error.code === 'P2025') {
+    if (error.code === "P2025") {
       return res.status(404).json({ error: "Usuário não encontrado." });
     }
     res.status(500).json({ error: "Erro ao excluir usuário." });
@@ -260,14 +266,14 @@ async function loginUsuario(req, res) {
     const usuario = await prisma.usuario.findUnique({
       where: { email: email },
     });
-    console.log('Usuário encontrado:', usuario);
+    console.log("Usuário encontrado:", usuario);
 
     if (!usuario) {
       return res.status(401).json({ message: "Credenciais inválidas." });
     }
 
     const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
-    console.log('Senha correta:', senhaCorreta);
+    console.log("Senha correta:", senhaCorreta);
 
     if (!senhaCorreta) {
       return res.status(401).json({ message: "Credenciais inválidas." });
@@ -275,12 +281,18 @@ async function loginUsuario(req, res) {
 
     if (!process.env.SECRET_JWT) {
       console.error("SECRET_JWT não está definido!");
-      return res.status(500).json({ message: "Erro no servidor: SECRET_JWT não definido." });
+      return res
+        .status(500)
+        .json({ message: "Erro no servidor: SECRET_JWT não definido." });
     }
 
-    const token = jwt.sign({ id: usuario.id, email: usuario.email }, process.env.SECRET_JWT, {
-      expiresIn: '1h',
-    });
+    const token = jwt.sign(
+      { id: usuario.id, email: usuario.email },
+      process.env.SECRET_JWT,
+      {
+        expiresIn: "1h",
+      }
+    );
 
     res.status(200).json({ message: "Login bem-sucedido!", token });
   } catch (error) {
@@ -289,11 +301,21 @@ async function loginUsuario(req, res) {
   }
 }
 
-async function pegarIdUsuario(req, res) {
-  res.status(200).json({ id: req.userId });
+async function logout(req, res) {
+  const token =
+    req.headers.authorization && req.headers.authorization.split(" ")[1];
+  try {
+    if (token) {
+      blackListToken(token);
+      res.status(200).json({ message: "Logout realizado com sucesso" });
+    } else {
+      res.status(400).json({ message: "Token não fornecido" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro ao deslogar" });
+  }
 }
-
-
 
 module.exports = {
   criaUsuario,
@@ -301,5 +323,5 @@ module.exports = {
   atualizaUsuario,
   deletaUsuario,
   loginUsuario,
-  pegarIdUsuario
+  logout,
 };
