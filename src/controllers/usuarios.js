@@ -53,6 +53,10 @@ async function criaUsuario(req, res) {
   const { nome, email, senha, data_nascimento, status } = req.body;
   try {
     const senhaCriptografada = await bcrypt.hash(senha, 10);
+    const novaDataNascimento = new Date(Date.parse(data_nascimento));
+    if(isNaN(novaDataNascimento.getTime())) {
+      throw new Error("Data de nascimento inválida.");
+    }
     const novoUsuario = await prisma.usuario.create({
       data: {
         nome,
