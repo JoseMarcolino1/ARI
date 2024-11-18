@@ -3,6 +3,7 @@ const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const env = require('dotenv').config();
 const cors =  require('cors');
+const swaggerOptions = require('./config/swaggerOptions');
 
 
 const app = express();
@@ -11,28 +12,8 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// Configuração do Swagger JSDoc
-const swaggerOptions = {
-    definition: {
-      openapi: '3.0.0',
-      info: {
-        title: 'API de remedios',
-        version: '1.0.0',
-        description: 'API para gerenciar remedios',
-      },
-      servers: [
-        {
-          url: 'http://localhost:3000',
-        },
-      ],
-    },
-    apis: ['./src/controllers/*.js', './src/routes/*.js'],  
-  };
+const swaggerDocs = swaggerJsDoc(swaggerOptions)
 
-// Cria a documentação Swagger
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-
-// Configuração do Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Importar rotas

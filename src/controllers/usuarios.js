@@ -9,54 +9,15 @@ const prisma = new PrismaClient();
 
 router.use(express.json());
 
-/**
- * @swagger
- * /usuarios:
- *   post:
- *     summary: Cria um novo usuário
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               nome:
- *                 type: string
- *               email:
- *                 type: string
- *               senha:
- *                 type: string
- *               data_nascimento:
- *                 type: string
- *                 format: date-time
- *               status:
- *                 type: boolean
- *             required:
- *               - nome
- *               - email
- *               - senha
- *               - data_nascimento
- *     responses:
- *       201:
- *         description: Usuário criado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   description: ID do usuário criado
- */
+
 async function criaUsuario(req, res) {
   const { nome, email, senha, data_nascimento, status } = req.body;
   try {
-    const senhaCriptografada = await bcrypt.hash(senha, 10);
-    const novaDataNascimento = new Date(Date.parse(data_nascimento));
-    if(isNaN(novaDataNascimento.getTime())) {
+    // Verifica se a data está no formato correto
+    if (!data_nascimento || isNaN(new Date(data_nascimento).getTime())) {
       throw new Error("Data de nascimento inválida.");
     }
+    const senhaCriptografada = await bcrypt.hash(senha, 10);
     const novoUsuario = await prisma.usuario.create({
       data: {
         nome,
@@ -77,30 +38,7 @@ async function criaUsuario(req, res) {
   }
 }
 
-/**
- * @swagger
- * /usuarios:
- *   get:
- *     summary: Lista todos os usuários
- *     responses:
- *       200:
- *         description: Lista de usuários
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   nome:
- *                     type: string
- *                   email:
- *                     type: string
- *                   status:
- *                     type: boolean
- */
+
 async function listaUsuario(req, res) {
   const id_usuario = req.user?.id;
   try {
@@ -117,47 +55,7 @@ async function listaUsuario(req, res) {
   }
 }
 
-/**
- * @swagger
- * /usuarios/{id}:
- *   put:
- *     summary: Atualiza um usuário existente
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID do usuário a ser atualizado
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               nome:
- *                 type: string
- *               email:
- *                 type: string
- *               senha:
- *                 type: string
- *               data_nascimento:
- *                 type: string
- *                 format: date-time
- *               status:
- *                 type: boolean
- *     responses:
- *       200:
- *         description: Usuário atualizado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- */
+
 async function atualizaUsuario(req, res) {
   const { id } = req.params;
   const { nome, email, senha, data_nascimento, status } = req.body;
@@ -187,22 +85,7 @@ async function atualizaUsuario(req, res) {
   }
 }
 
-/**
- * @swagger
- * /usuarios/{id}:
- *   delete:
- *     summary: Exclui um usuário logicamente
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID do usuário a ser excluído
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Usuário excluído logicamente
- */
+
 async function deletaUsuario(req, res) {
   const { id } = req.params;
 
@@ -231,38 +114,7 @@ async function deletaUsuario(req, res) {
   }
 }
 
-/**
- * @swagger
- * /usuarios/login:
- *   post:
- *     summary: Realiza o login do usuário
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *               senha:
- *                 type: string
- *             required:
- *               - email
- *               - senha
- *     responses:
- *       200:
- *         description: Login bem-sucedido
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *       401:
- *         description: Credenciais inválidas
- */
+
 async function loginUsuario(req, res) {
   const { email, senha } = req.body;
 
